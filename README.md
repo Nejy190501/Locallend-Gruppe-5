@@ -38,11 +38,11 @@ pip install -r requirements.txt
 
 ## How to initialise database
 
-```bash
-flask init-db
-```
+The database is automatically created when the application starts for the first time via flask run.
 
-The command creates the SQLite database and required tables.
+The SQLite database file locallend.db is stored in the instance/ folder.
+
+Seed data (two test users and two example items) is automatically inserted if the database is empty.
 
 ## Project Description
 
@@ -57,10 +57,13 @@ The goal of the project is to reduce unnecessary purchases and support sustainab
 - User Logout
 - Session Management
 - Create Items
+- Edit Items
+- Delete Items
 - Browse Available Items
 - Borrowing Requests
 - Accept Requests
 - Reject Requests
+- Return Items
 - Request Status Management
 - JSON API Endpoints
 
@@ -69,6 +72,7 @@ The goal of the project is to reduce unnecessary purchases and support sustainab
 - pending
 - accepted
 - rejected
+- returned
 
 ## Technology Stack
 
