@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, session, abort
+from flask import Flask, render_template, request, redirect, url_for, jsonify, session, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from database.models import db, User, Item, Request as BorrowRequest
 
@@ -18,7 +18,7 @@ with app.app_context():
     if existing_user is None:
         user1 = User(
         first_name="Anna",
-        last_name="Müller",
+        last_name="Mueller",
         email="anna@example.com",
         password=generate_password_hash("test123")
 
@@ -44,7 +44,7 @@ with app.app_context():
         user_id= user.user_id,
         title="Bohrmaschine",
         category= "Werkzeug",
-        description= "Für kleine Reperaturen und Umzüge",
+        description= "Fuer kleine Reperaturen und Umzuege",
         availability= "available"
         )
 
@@ -52,7 +52,7 @@ with app.app_context():
         user_id= user.user_id,
         title= "Beamer",
         category="Technik",
-        description="Für Präsentationen oder Filmabende",
+        description="Fuer Praesentationen oder Filmabende",
         availability="available"
         )
 
@@ -79,7 +79,8 @@ def register():
         ).scalar()
 
         if existing_user:
-            return render_template("register.html", error="Diese E-Mail ist bereits registriert.")
+            flash("Diese E-Mail ist bereits registriert.", "danger")
+            return redirect(url_for("register"))
 
         hashed_password = generate_password_hash(password)
 
@@ -95,6 +96,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
+        flash("Registrierung erfolgreich! Bitte melde dich an.", "success")
         return redirect(url_for("login"))
 
     return render_template("register.html")
@@ -116,15 +118,18 @@ def login():
         if user and check_password_hash(user.password, password):
             session["user_id"] = user.user_id
             session["user_name"] = user.first_name
+            flash("Erfolgreich angemeldet!", "success")
             return redirect(url_for("home"))
 
-        return "Login failed."
+        flash("Login fehlgeschlagen. Bitte ueberpreufe deine Angaben.", "danger")
+        return redirect(url_for("login"))
 
     return render_template("login.html")
 
 @app.route("/logout")
 def logout():
     session.clear()
+    flash("Du wurdest abgemeldet.", "info")
     return redirect(url_for("home"))
 
 @app.route("/profile")
@@ -258,9 +263,61 @@ def add_item():
         db.session.add(new_item)
         db.session.commit()
 
+        flash("Objekt erfolgreich erstellt!", "success")
         return redirect(url_for("profile"))
 
     return render_template("add_item.html")
+
+
+@app.route("/edit_item/<int:item_id>", methods=["GET", "POST"])
+def edit_item(item_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    item = db.session.get(Item, item_id)
+
+    if item is None:
+        abort(404)
+
+    if item.user_id != session["user_id"]:
+        abort(403)
+
+    if request.method == "POST":
+        item.title = request.form.get("name") or request.form.get("title")
+        item.description = request.form["description"]
+        item.category = request.form["category"]
+
+        if request.form.get("status"):
+            item.availability = "available"
+        else:
+            item.availability = "unavailable"
+
+        db.session.commit()
+
+        flash("Objekt erfolgreich aktualisiert!", "success")
+        return redirect(url_for("profile"))
+
+    return render_template("edit_item.html", item=item)
+
+
+@app.route("/delete_item/<int:item_id>", methods=["POST"])
+def delete_item(item_id):
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+
+    item = db.session.get(Item, item_id)
+
+    if item is None:
+        abort(404)
+
+    if item.user_id != session["user_id"]:
+        abort(403)
+
+    db.session.delete(item)
+    db.session.commit()
+
+    flash("Objekt erfolgreich geloescht!", "success")
+    return redirect(url_for("profile"))
 
 
 @app.route("/request/<int:item_id>", methods=["POST"])
@@ -290,6 +347,7 @@ def create_request(item_id):
     ).scalar()
 
     if existing_request:
+        flash("Du hast bereits eine Anfrage fuer dieses Objekt gestellt.", "info")
         return redirect(url_for("profile"))
 
     new_request = BorrowRequest(
@@ -301,6 +359,7 @@ def create_request(item_id):
     db.session.add(new_request)
     db.session.commit()
 
+    flash("Anfrage erfolgreich gesendet!", "success")
     return redirect(url_for("profile"))
 
 @app.route("/requests")
@@ -368,6 +427,7 @@ def accept_request(request_id):
 
     db.session.commit()
 
+    flash("Anfrage akzeptiert!", "success")
     return redirect(url_for("requests_page"))
 
 
@@ -395,6 +455,7 @@ def reject_request(request_id):
     request_item.status = "rejected"
     db.session.commit()
 
+    flash("Anfrage abgelehnt.", "info")
     return redirect(url_for("requests_page"))
 
 @app.route("/requests/<int:request_id>/return", methods=["POST"])
@@ -423,6 +484,7 @@ def return_item(request_id):
 
     db.session.commit()
 
+    flash("Rueckgabe erfolgreich bestaetigt!", "success")
     return redirect(url_for("profile"))
 
 @app.route("/api/items")
