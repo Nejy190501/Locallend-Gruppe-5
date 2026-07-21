@@ -11,13 +11,9 @@
                     <h2 class="fw-bold">Konto erstellen</h2>
                     <p class="text-secondary">Tritt unserer Community bei und beginne zu teilen.</p>
                 </div>
-                {% if error %}
-                <div class="alert alert-danger">
-                    {{ error }}          
-                </div>
-                {% endif %}
                 
                 <form action="/register" method="POST">
+                <!-- Registrierungsformular -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="first_name" class="form-label fw-semibold">Vorname</label>
@@ -31,7 +27,6 @@
                     
                     <div class="mb-3">
                         <label for="email" class="form-label fw-semibold">E-Mail Adresse</label>
-                        <!-- Hier nutze ich Bootstrap 'input-group' um das Icon mit dem Input zu verbinden -->
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-secondary"></i></span>
                             <input type="email" class="form-control border-start-0 ps-0" id="email" name="email" placeholder="name@beispiel.de" required>
@@ -39,6 +34,7 @@
                     </div>
                     
                     <div class="mb-4">
+                        <!-- Passwort-Feld -->
                         <label for="password" class="form-label fw-semibold">Passwort</label>
                         <div class="input-group">
                             <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-secondary"></i></span>
