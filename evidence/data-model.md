@@ -139,6 +139,7 @@ Mögliche Statuswerte:
 - pending
 - accepted
 - rejected
+- returned
 
 ## Zusammenfassung des Datenmodells
 
