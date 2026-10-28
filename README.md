@@ -1,6 +1,6 @@
 # LocalLend
 
-Contributors: Mariam Joumma, Tuba, Wendy, Yves
+Contributors: Mariam Joumma, Tuba, Wendy, Jean Yves Nkwane
 
 ## How to run application
 
@@ -135,7 +135,7 @@ Responsible for:
 - Database Queries
 - Tables for Users, Items and Requests
 
-### Yves
+### Jean Yves Nkwane
 
 Responsible for:
 
@@ -150,7 +150,7 @@ Responsible for:
 - Mariam Joumma
 - Tuba
 - Wendy
-- Yves
+- Jean Yves Nkwane
 
 
 
